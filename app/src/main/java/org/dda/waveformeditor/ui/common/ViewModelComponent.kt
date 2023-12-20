@@ -5,23 +5,35 @@ import androidx.lifecycle.ViewModelLazy
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.CreationExtras
-import scout.Component
-import scout.Scope
+import org.dda.waveformeditor.di.BaseComponent
+import org.dda.waveformeditor.di.ScopeHolder
 
-abstract class ViewModelComponent<V : BaseViewModel>(
-    scope: Scope
-) : Component(scope) {
+interface ViewModelScopeHolder<VM : BaseViewModel> : ScopeHolder
 
-    abstract fun provideViewModel(): V
+abstract class ViewModelComponent<VM : BaseViewModel, SH : ViewModelScopeHolder<VM>>(
+    scopeHolder: SH
+) : BaseComponent<SH>(scopeHolder) {
 
-    open fun provideViewModel(extras: CreationExtras): V {
+    abstract fun provideViewModel(): VM
+
+    open fun provideViewModel(extras: CreationExtras): VM {
         return provideViewModel()
     }
 
 }
 
-class ComponentViewModelFactory<VM : BaseViewModel>(
-    private val component: ViewModelComponent<VM>
+inline fun <reified VM : BaseViewModel, reified SH : ViewModelScopeHolder<VM>> createViewModelComponent(
+    scopeHolder: SH
+): ViewModelComponent<VM, SH> {
+    return object : ViewModelComponent<VM, SH>(scopeHolder) {
+        override fun provideViewModel(): VM {
+            return get<VM>()
+        }
+    }
+}
+
+class ComponentViewModelFactory<VM : BaseViewModel, SH : ViewModelScopeHolder<VM>>(
+    private val component: ViewModelComponent<VM, SH>
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -35,8 +47,8 @@ class ComponentViewModelFactory<VM : BaseViewModel>(
     }
 }
 
-inline fun <reified VM : BaseViewModel> ViewModelStoreOwner.viewModelComponent(
-    componentProducer: () -> ViewModelComponent<VM>
+inline fun <reified VM : BaseViewModel, SH : ViewModelScopeHolder<VM>> ViewModelStoreOwner.viewModelComponent(
+    componentProducer: () -> ViewModelComponent<VM, SH>
 ): Lazy<VM> {
 
     val factory = ComponentViewModelFactory(
@@ -48,4 +60,12 @@ inline fun <reified VM : BaseViewModel> ViewModelStoreOwner.viewModelComponent(
         storeProducer = { viewModelStore },
         factoryProducer = { factory },
     )
+}
+
+inline fun <reified VM : BaseViewModel, reified SH : ViewModelScopeHolder<VM>> ViewModelStoreOwner.viewModelComponent(
+    scopeHolder: SH
+): Lazy<VM> {
+    return viewModelComponent<VM, SH> {
+        createViewModelComponent<VM, SH>(scopeHolder)
+    }
 }

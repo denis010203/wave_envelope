@@ -11,7 +11,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             WaveformEditorTheme {
-                NavScreens()
+                NavScreens {
+                    (application as WaveApp).appComponent
+                }
             }
         }
     }
