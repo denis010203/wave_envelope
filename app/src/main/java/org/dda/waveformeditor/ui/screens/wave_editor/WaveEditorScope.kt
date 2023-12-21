@@ -21,7 +21,8 @@ class WaveEditorScope(
                 fileUri = fileUri,
                 fileResolver = FileResolverImpl(
                     appContext = getProvider<AppContext>().get()
-                )
+                ),
+                waveDataFormat = get()
             )
         }
     }

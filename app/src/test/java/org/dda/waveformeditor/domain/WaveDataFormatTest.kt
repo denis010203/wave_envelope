@@ -9,11 +9,11 @@ import kotlin.test.assertTrue
 
 class WaveDataFormatTest {
 
-    private lateinit var waveDataLoader: WaveDataLoader
+    private lateinit var waveDataFormat: WaveDataFormat
 
     @Before
     fun setup() {
-        waveDataLoader = WaveDataLoaderImpl()
+        waveDataFormat = WaveDataFormatImpl()
     }
 
     @Test
@@ -30,7 +30,7 @@ class WaveDataFormatTest {
             
         """.trimIndent()
 
-        val waveDataResult = waveDataLoader.parse(stringData, true)
+        val waveDataResult = waveDataFormat.parse(stringData, true)
         assertEquals(
             expected = WaveData(
                 values = doubleArrayOf(
@@ -57,7 +57,7 @@ class WaveDataFormatTest {
             -0.008850098 0.0077209473
         """.trimIndent()
         assertTrue {
-            waveDataLoader.parse(
+            waveDataFormat.parse(
                 fileData = dataToWrongDelimiter,
                 validateValues = true
             ).isFailure
@@ -69,7 +69,7 @@ class WaveDataFormatTest {
             -0.008850098 q
         """.trimIndent()
         assertTrue {
-            waveDataLoader.parse(
+            waveDataFormat.parse(
                 fileData = dataToNotNumber,
                 validateValues = true
             ).isFailure
@@ -86,7 +86,7 @@ class WaveDataFormatTest {
             -0.009674072 0.009429932
         """.trimIndent()
         assertTrue {
-            waveDataLoader.parse(
+            waveDataFormat.parse(
                 fileData = dataOutOfRangePositive,
                 validateValues = true
             ).isFailure
@@ -100,7 +100,7 @@ class WaveDataFormatTest {
             -0.009674072 0.009429932
         """.trimIndent()
         assertTrue {
-            waveDataLoader.parse(
+            waveDataFormat.parse(
                 fileData = dataOutOfRangeNegative,
                 validateValues = true
             ).isFailure

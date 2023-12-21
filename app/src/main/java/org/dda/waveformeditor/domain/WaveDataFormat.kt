@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import org.dda.waveformeditor.domain.entities.WaveData
 import java.io.OutputStream
 
-interface WaveDataLoader {
+interface WaveDataFormat {
 
     suspend fun parse(fileData: String, validateValues: Boolean): Result<WaveData>
 
@@ -14,9 +14,9 @@ interface WaveDataLoader {
 
 }
 
-class WaveDataLoaderImpl(
+class WaveDataFormatImpl(
     private val cellDelimiter: String = " ",
-) : WaveDataLoader {
+) : WaveDataFormat {
 
     override suspend fun parse(fileData: String, validateValues: Boolean): Result<WaveData> {
         return withContext(Dispatchers.Default) {

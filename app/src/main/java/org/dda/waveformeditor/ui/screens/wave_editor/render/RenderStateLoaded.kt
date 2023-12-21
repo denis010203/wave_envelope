@@ -141,9 +141,9 @@ fun RenderStateLoaded(
             Text(
                 text = "Loaded data:"
             )
-            Text(
-                text = state.fileData
-            )
+            state.waveEditData.waveData.iteratePairsIndexed { index, top, bottom ->
+                Text(text = "[$index, $top, $bottom]")
+            }
         }
     }
 }

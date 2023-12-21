@@ -1,7 +1,6 @@
 package org.dda.waveformeditor.domain.entities
 
 import androidx.compose.runtime.Immutable
-import kotlinx.collections.immutable.toImmutableList
 
 @Immutable
 class WaveData(
@@ -115,25 +114,5 @@ class WaveData(
 
     override fun hashCode(): Int {
         return hash
-    }
-}
-
-fun String.parseToWaveData(
-    delimiters: String = " "
-): Result<WaveData> {
-    return try {
-        Result.success(
-            WaveData(
-                values = lineSequence().filter { line ->
-                    line.isNotBlank()
-                }.flatMap { line ->
-                    line.split(delimiters).map { value ->
-                        value.toDouble()
-                    }
-                }.toImmutableList().toDoubleArray()
-            )
-        )
-    } catch (e: Throwable) {
-        Result.failure(IllegalArgumentException("Wrong data format"))
     }
 }

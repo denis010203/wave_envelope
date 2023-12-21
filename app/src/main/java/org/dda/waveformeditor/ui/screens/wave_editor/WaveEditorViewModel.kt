@@ -2,13 +2,12 @@ package org.dda.waveformeditor.ui.screens.wave_editor
 
 import android.net.Uri
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import org.dda.waveformeditor.domain.WaveDataFormat
 import org.dda.waveformeditor.ui.common.BaseViewModel
 import org.dda.waveformeditor.ui.tools.FileResolver
 
@@ -35,6 +34,7 @@ interface WaveEditorViewModel {
 class WaveEditorViewModelImpl(
     fileUri: Uri,
     val fileResolver: FileResolver,
+    val waveDataFormat: WaveDataFormat,
     scope: CoroutineScope? = null,
 ) : BaseViewModel(scope), WaveEditorViewModel {
 
@@ -65,16 +65,17 @@ class WaveEditorViewModelImpl(
 
         coroutineScope.launch {
             runCatching {
-                fileResolver.readFile(fileUri)
-            }.onSuccess { content ->
+                val fileContent = fileResolver.readFile(fileUri)
+                val waveData = waveDataFormat.parse(
+                    fileData = fileContent,
+                    validateValues = true
+                ).getOrThrow()
                 stateFlowInternal.update { state ->
-                    withContext(Dispatchers.Default) {
-                        state.onReadFileContent(content)
-                    }
+                    state.onReadFileContent(waveData)
                 }
             }.onFailure { thr ->
                 stateFlowInternal.update { state ->
-                    state.onFileReadFileContent(thr)
+                    state.onFileReadFail(thr)
                 }
             }
         }

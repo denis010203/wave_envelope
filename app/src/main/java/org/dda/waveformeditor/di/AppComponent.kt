@@ -1,5 +1,6 @@
 package org.dda.waveformeditor.di
 
+import org.dda.waveformeditor.domain.di.useDomainBeans
 import org.dda.waveformeditor.extra.AppContext
 import org.dda.waveformeditor.useAndroidAppBeans
 import scout.Scope
@@ -15,5 +16,6 @@ class AppScope(
 ) : ScopeHolder {
     override val scope: Scope = scope("globalScope") {
         useAndroidAppBeans(appContext)
+        useDomainBeans()
     }
 }
