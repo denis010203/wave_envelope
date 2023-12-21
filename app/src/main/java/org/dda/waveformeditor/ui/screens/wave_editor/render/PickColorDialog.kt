@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PickColorDialog(
-    colorList: List<Color>,
+    colorList: Set<Color>,
     selected: Color,
     onDismiss: () -> Unit,
     onColorSelected: (Color) -> Unit

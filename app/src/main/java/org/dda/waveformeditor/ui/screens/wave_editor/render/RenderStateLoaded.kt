@@ -41,7 +41,10 @@ fun RenderStateLoaded(
             state = rememberScrollState()
         )
     ) {
-        val colorList = MaterialTheme.colorScheme.getColorMap().values.take(15)
+        val colorList = MaterialTheme.colorScheme.getColorMap()
+            .values
+            .take(15)
+            .toSet()
         var waveFillColor by remember { mutableStateOf(Color.Yellow) }
         var lineTopColor by remember { mutableStateOf(Color.Magenta) }
         var lineBottomColor by remember { mutableStateOf(Color.Cyan) }
@@ -149,7 +152,7 @@ fun RenderStateLoaded(
 private fun ColumnScope.RenderColorSelector(
     label: String,
     color: Color,
-    colorList: List<Color>,
+    colorList: Set<Color>,
     onValueChange: (color: Color) -> Unit
 ) {
     Row(
