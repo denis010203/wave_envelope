@@ -28,7 +28,6 @@ class WaveDataFormatImpl(
                             line.isNotBlank()
                         }.flatMap { line ->
                             line.split(cellDelimiter).map { value ->
-                                println("value: $value -> ${value.toDouble()}")
                                 value.toDouble()
                             }
                         }.toImmutableList().toDoubleArray()

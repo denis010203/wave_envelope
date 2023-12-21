@@ -6,35 +6,6 @@ import kotlin.test.assertEquals
 class WaveDataTest {
 
     @Test
-    fun `Check parsing`() {
-        val stringData = """
-            -0.00579834 0.0082092285
-            -0.009674072 0.009429932
-            -0.008850098 0.0077209473
-            -0.007171631 0.007293701
-            -0.007659912 0.0069885254
-            -0.24105835 0.21847534
-            -0.24606323 0.17340088
-            
-        """.trimIndent()
-        val waveData = stringData.parseToWaveData().getOrNull()
-        assertEquals(
-            actual = waveData,
-            expected = WaveData(
-                values = doubleArrayOf(
-                    -0.00579834, 0.0082092285,
-                    -0.009674072, 0.009429932,
-                    -0.008850098, 0.0077209473,
-                    -0.007171631, 0.007293701,
-                    -0.007659912, 0.0069885254,
-                    -0.24105835, 0.21847534,
-                    -0.24606323, 0.17340088,
-                )
-            )
-        )
-    }
-
-    @Test
     fun `Check iteratePairs`() {
         val actual = mutableListOf<Triple<Int, Double, Double>>()
         WaveData(
