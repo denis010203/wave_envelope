@@ -160,7 +160,7 @@ private fun RenderDebug(
     if (state.showDebug) {
         Text(text = "Selected data:")
         state.waveEditData.iteratePairsSelected { index, top, bottom ->
-            Text(text = "[$index, $top, $bottom]")
+            Text(text = "[$index, $bottom, $top]")
         }
 
         Text(

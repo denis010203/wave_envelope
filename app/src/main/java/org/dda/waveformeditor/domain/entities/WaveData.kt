@@ -19,6 +19,11 @@ class WaveData(
                     value in VALUE_RANGE
                 }
             )
+            iteratePairsIndexed { index, top, bottom ->
+                require(top >= bottom) {
+                    "Wrong value pairs at $index top: $top $bottom"
+                }
+            }
         }
     }
 
@@ -68,11 +73,11 @@ class WaveData(
         toPairIndex: Int,
         onElement: (index: Int, top: Double, bottom: Double) -> Unit
     ) {
-        for (i in fromPairIndex..toPairIndex step 2) {
+        for (i in fromPairIndex..toPairIndex) {
             onElement(
-                i / 2,
-                getAtIndex(i + 1),
-                getAtIndex(i)
+                i,
+                getAtIndex(i * 2 + 1),
+                getAtIndex(i * 2)
             )
         }
     }

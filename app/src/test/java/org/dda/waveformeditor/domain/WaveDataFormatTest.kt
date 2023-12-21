@@ -4,6 +4,7 @@ import kotlinx.coroutines.test.runTest
 import org.dda.waveformeditor.domain.entities.WaveData
 import org.junit.Before
 import org.junit.Test
+import java.io.ByteArrayOutputStream
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -105,5 +106,38 @@ class WaveDataFormatTest {
                 validateValues = true
             ).isFailure
         }
+    }
+
+    @Test
+    fun `Check saving selection`() = runTest{
+        val data = WaveData(
+            values = doubleArrayOf(
+                -0.00579834, 0.0082092285,
+                -0.1, 0.1,
+                -0.2, 0.2,
+                -0.3, 0.3,
+                -0.4, 0.4,
+                -0.5, 0.5,
+                -0.24606323, 0.17340088,
+            ),
+            validateValues = true
+        )
+        val outputStream = ByteArrayOutputStream()
+        waveDataFormat.save(
+            data = data,
+            selection = 1..5,
+            output = outputStream
+        )
+        assertEquals(
+            actual = String(outputStream.toByteArray()),
+            expected = """
+                -0.1 0.1
+                -0.2 0.2
+                -0.3 0.3
+                -0.4 0.4
+                -0.5 0.5
+                
+           """.trimIndent()
+        )
     }
 }
