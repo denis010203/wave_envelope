@@ -94,12 +94,12 @@ private fun WaveDataPreview() {
                 ),
         ) {
             val data = WaveData(
-                values = floatArrayOf(
-                    0.0F, 0.0F,
-                    -0.6F, 0.5F,
-                    -0.1F, 0.2F,
-                    -0.9F, 1.0F,
-                    -0.3F, 0.4F,
+                values = doubleArrayOf(
+                    0.0, 0.0,
+                    -0.6, 0.5,
+                    -0.1, 0.2,
+                    -0.9, 1.0,
+                    -0.3, 0.4,
                 )
             )
             Wave(
@@ -241,7 +241,7 @@ private fun DrawScope.drawDebugInfo(
                 textMeasurer = textMeasure,
                 text = "[$index, $top]",
                 topLeft = Offset(
-                    y = translateY(top, center),
+                    y = translateY(top.toFloat(), center),
                     x = x
                 )
             )
@@ -249,7 +249,7 @@ private fun DrawScope.drawDebugInfo(
                 textMeasurer = textMeasure,
                 text = "[$index, $bottom]",
                 topLeft = Offset(
-                    y = translateY(bottom, center),
+                    y = translateY(bottom.toFloat(), center),
                     x = x
                 )
             )
@@ -264,9 +264,9 @@ private fun WaveData.generateTopPath(center: Offset, size: Size): Path {
     var x = 0F
     iterateTopIndexed { index, top ->
         if (index == 0) {
-            path.moveTo(x = x, y = translateY(top, center))
+            path.moveTo(x = x, y = translateY(top.toFloat(), center))
         } else {
-            path.lineTo(x = x, y = translateY(top, center))
+            path.lineTo(x = x, y = translateY(top.toFloat(), center))
         }
         x += stepX
     }
@@ -279,9 +279,9 @@ private fun WaveData.generateBottomPath(center: Offset, size: Size): Path {
     var x = 0F
     iterateBottomIndexed { index, bottom ->
         if (index == 0) {
-            path.moveTo(x = x, y = translateY(bottom, center))
+            path.moveTo(x = x, y = translateY(bottom.toFloat(), center))
         } else {
-            path.lineTo(x = x, y = translateY(bottom, center))
+            path.lineTo(x = x, y = translateY(bottom.toFloat(), center))
         }
         x += stepX
     }
@@ -293,7 +293,7 @@ private fun WaveData.generatePath(center: Offset, size: Size): Path {
     return generateTopPath(center, size).apply {
         lineTo(
             x = size.width,
-            y = translateY(lastBottom(), center)
+            y = translateY(lastBottom().toFloat(), center)
         )
 
         val stepX = size.width / (pairsCount - 1)
@@ -301,7 +301,7 @@ private fun WaveData.generatePath(center: Offset, size: Size): Path {
         iterateBottomIndexed(reversed = true) { _, bottom ->
             lineTo(
                 x = x,
-                y = translateY(bottom, center)
+                y = translateY(bottom.toFloat(), center)
             )
             x -= stepX
         }

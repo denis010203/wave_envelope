@@ -1,18 +1,31 @@
 package org.dda.waveformeditor.domain.entities
 
 import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.toImmutableList
 
 @Immutable
 class WaveData(
-    private val values: FloatArray
+    private val values: DoubleArray,
+    validateValues: Boolean = false
 ) {
+    companion object {
+        val VALUE_RANGE = -1.0..1.0
+    }
+
     init {
         require(values.size % 2 == 0)
+        if (validateValues) {
+            require(
+                values.all { value ->
+                    value in VALUE_RANGE
+                }
+            )
+        }
     }
 
     private val hash by lazy { values.contentHashCode() }
 
-    fun getAtIndex(index: Int): Float = values[index]
+    fun getAtIndex(index: Int): Double = values[index]
 
     val indicesAll: IntRange
         get() = values.indices
@@ -21,27 +34,27 @@ class WaveData(
 
     val indicesPairs: IntRange = IntRange(0, pairsCount)
 
-    fun getTop(index: Int): Float = values[index + 1]
-    fun getBottom(index: Int): Float = values[index]
+    fun getTop(index: Int): Double = values[index + 1]
+    fun getBottom(index: Int): Double = values[index]
 
-    fun lastTop(): Float {
+    fun lastTop(): Double {
         return values.last()
     }
 
-    fun lastBottom(): Float {
+    fun lastBottom(): Double {
         if (isEmpty())
             throw NoSuchElementException("Array is empty.")
         return values[values.size - 2]
     }
 
-    fun firstTop(): Float {
+    fun firstTop(): Double {
         return values.first()
     }
 
     fun isEmpty(): Boolean = values.isEmpty()
     fun isNotEmpty(): Boolean = values.isNotEmpty()
 
-    inline fun iteratePairsIndexed(onElement: (index: Int, top: Float, bottom: Float) -> Unit) {
+    inline fun iteratePairsIndexed(onElement: (index: Int, top: Double, bottom: Double) -> Unit) {
         for (i in indicesAll step 2) {
             onElement(
                 i / 2,
@@ -54,7 +67,7 @@ class WaveData(
     inline fun iteratePairsIndexed(
         fromPairIndex: Int,
         toPairIndex: Int,
-        onElement: (index: Int, top: Float, bottom: Float) -> Unit
+        onElement: (index: Int, top: Double, bottom: Double) -> Unit
     ) {
         for (i in fromPairIndex..toPairIndex step 2) {
             onElement(
@@ -65,7 +78,7 @@ class WaveData(
         }
     }
 
-    inline fun iterateTopIndexed(onElement: (index: Int, top: Float) -> Unit) {
+    inline fun iterateTopIndexed(onElement: (index: Int, top: Double) -> Unit) {
         for (i in indicesAll step 2) {
             onElement(
                 i / 2,
@@ -76,7 +89,7 @@ class WaveData(
 
     inline fun iterateBottomIndexed(
         reversed: Boolean = false,
-        onElement: (index: Int, bottom: Float) -> Unit
+        onElement: (index: Int, bottom: Double) -> Unit
     ) {
         val range = if (reversed) {
             (indicesAll step 2).reversed()
@@ -111,13 +124,13 @@ fun String.parseToWaveData(
     return try {
         Result.success(
             WaveData(
-                values = lines().filter { line ->
+                values = lineSequence().filter { line ->
                     line.isNotBlank()
                 }.flatMap { line ->
                     line.split(delimiters).map { value ->
-                        value.toFloat()
+                        value.toDouble()
                     }
-                }.toFloatArray()
+                }.toImmutableList().toDoubleArray()
             )
         )
     } catch (e: Throwable) {

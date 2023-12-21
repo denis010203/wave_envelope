@@ -16,7 +16,7 @@ data class WaveEditData(
         selectionEndPairIndex = waveData.pairsCount - 1
     )
 
-    inline fun iteratePairsSelected(onElement: (index: Int, top: Float, bottom: Float) -> Unit) {
+    inline fun iteratePairsSelected(onElement: (index: Int, top: Double, bottom: Double) -> Unit) {
         waveData.iteratePairsIndexed(selectionStartPairIndex, selectionEndPairIndex, onElement)
     }
 }
