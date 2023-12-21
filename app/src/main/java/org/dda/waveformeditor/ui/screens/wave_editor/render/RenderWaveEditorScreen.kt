@@ -1,5 +1,6 @@
 package org.dda.waveformeditor.ui.screens.wave_editor.render
 
+import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -9,6 +10,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -20,6 +24,7 @@ import org.dda.waveformeditor.ui.navigation.NavActions
 import org.dda.waveformeditor.ui.screens.wave_editor.WaveEditorState
 import org.dda.waveformeditor.ui.screens.wave_editor.WaveEditorViewModel
 import org.dda.waveformeditor.ui.theme.RenderConst
+import org.dda.waveformeditor.ui.tools.observeAsOneTimeEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,6 +34,23 @@ fun RenderWaveEditorScreen(
 ) {
 
     val state = viewModel.stateFlow.collectAsStateWithLifecycle()
+
+
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    viewModel.oneTimeMessageFlow.observeAsOneTimeEvent { event ->
+        when (event) {
+            is WaveEditorViewModel.OneTimeMessage.Text -> {
+                snackBarHostState
+                    .showSnackbar(
+                        message = event.text,
+                        actionLabel = "Action",
+                        duration = SnackbarDuration.Long
+                    )
+            }
+        }
+    }
+
 
     Scaffold(
         topBar = {
@@ -51,6 +73,9 @@ fun RenderWaveEditorScreen(
                     Text(state.value.title)
                 },
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState)
         }
     ) { paddings ->
         when (val stateLcl = state.value) {
@@ -79,6 +104,15 @@ fun RenderWaveEditorScreen(
                         )
                     }
                 }
+                val onSelectExportFile: (uri: Uri) -> Unit = remember(viewModel) {
+                    { uri: Uri ->
+                        viewModel.onUiEvent(
+                            WaveEditorViewModel.UiEvent.OnSelectExportFile(
+                                uri = uri
+                            )
+                        )
+                    }
+                }
 
                 RenderStateLoaded(
                     modifier = Modifier
@@ -87,6 +121,7 @@ fun RenderWaveEditorScreen(
                     state = stateLcl,
                     onSelect = onSelectWave,
                     onSwitchDebug = onSwitchDebug,
+                    onSelectExportFile = onSelectExportFile,
                 )
             }
 

@@ -20,7 +20,8 @@ sealed interface WaveEditorState {
             is Init, is Error -> Loaded(
                 uri = uri,
                 title = title,
-                waveEditData = WaveEditData(waveData)
+                waveEditData = WaveEditData(waveData),
+                exportSelectionFileName = "selection_$title",
             )
 
             is Loaded -> copy(
@@ -78,6 +79,7 @@ sealed interface WaveEditorState {
     data class Loaded(
         override val uri: Uri,
         override val title: String = "",
+        val exportSelectionFileName: String,
         val showDebug: Boolean = false,
         val waveEditData: WaveEditData,
     ) : WaveEditorState

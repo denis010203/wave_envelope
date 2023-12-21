@@ -10,7 +10,7 @@ interface WaveDataFormat {
 
     suspend fun parse(fileData: String, validateValues: Boolean): Result<WaveData>
 
-    suspend fun save(data: WaveData, output: OutputStream): Result<Int>
+    suspend fun save(data: WaveData, selection: IntRange, output: OutputStream): Result<Int>
 
 }
 
@@ -40,12 +40,19 @@ class WaveDataFormatImpl(
         }
     }
 
-    override suspend fun save(data: WaveData, output: OutputStream): Result<Int> {
+    override suspend fun save(
+        data: WaveData,
+        selection: IntRange,
+        output: OutputStream
+    ): Result<Int> {
         return withContext(Dispatchers.IO) {
             runCatching {
                 var lines = 0
                 output.bufferedWriter().use { writer ->
-                    data.iteratePairsIndexed { _, top, bottom ->
+                    data.iteratePairsIndexed(
+                        fromPairIndex = selection.first,
+                        toPairIndex = selection.last,
+                    ) { _, top, bottom ->
                         writer.appendLine("$bottom$cellDelimiter$top")
                         lines++
                     }

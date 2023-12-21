@@ -1,5 +1,8 @@
 package org.dda.waveformeditor.ui.screens.wave_editor.render
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +37,7 @@ fun RenderStateLoaded(
     modifier: Modifier,
     state: WaveEditorState.Loaded,
     onSelect: (startIndex: Int, endIndex: Int) -> Unit,
+    onSelectExportFile: (uri: Uri) -> Unit,
     onSwitchDebug: (Boolean) -> Unit,
 ) {
     Column(
@@ -81,22 +85,15 @@ fun RenderStateLoaded(
             isShowDebug = state.showDebug,
             onSelect = onSelect
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+
+        SaveFile(
             modifier = Modifier
-                .padding(vertical = 10.dp)
-                .align(Alignment.End)
-        ) {
-            Text(
-                modifier = Modifier.padding(end = 10.dp),
-                style = MaterialTheme.typography.headlineSmall,
-                text = "Enable debug",
-            )
-            Switch(
-                checked = state.showDebug,
-                onCheckedChange = onSwitchDebug,
-            )
-        }
+                .padding(vertical = 20.dp),
+            label = "Save to: ${state.exportSelectionFileName}",
+            fileName = state.exportSelectionFileName,
+            onUri = onSelectExportFile,
+        )
+
         RenderColorSelector(
             label = "Wave fill color",
             color = waveFillColor,
@@ -132,18 +129,45 @@ fun RenderStateLoaded(
         ) { color ->
             selectorHighlightColor = color
         }
-        if (state.showDebug) {
-            Text(text = "Selected data:")
-            state.waveEditData.iteratePairsSelected { index, top, bottom ->
-                Text(text = "[$index, $top, $bottom]")
-            }
 
-            Text(
-                text = "Loaded data:"
-            )
-            state.waveEditData.waveData.iteratePairsIndexed { index, top, bottom ->
-                Text(text = "[$index, $top, $bottom]")
-            }
+        RenderDebug(
+            state = state,
+            onSwitchDebug = onSwitchDebug,
+        )
+
+    }
+}
+
+@Composable
+private fun RenderDebug(
+    state: WaveEditorState.Loaded,
+    onSwitchDebug: (Boolean) -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(vertical = 10.dp)
+    ) {
+        Text(
+            modifier = Modifier.padding(end = 10.dp),
+            style = MaterialTheme.typography.headlineSmall,
+            text = "Enable debug",
+        )
+        Switch(
+            checked = state.showDebug,
+            onCheckedChange = onSwitchDebug,
+        )
+    }
+    if (state.showDebug) {
+        Text(text = "Selected data:")
+        state.waveEditData.iteratePairsSelected { index, top, bottom ->
+            Text(text = "[$index, $top, $bottom]")
+        }
+
+        Text(
+            text = "Loaded data:"
+        )
+        state.waveEditData.waveData.iteratePairsIndexed { index, top, bottom ->
+            Text(text = "[$index, $top, $bottom]")
         }
     }
 }
@@ -196,4 +220,34 @@ private fun ColumnScope.RenderColorSelector(
             )
         }
     }
+}
+
+
+@Composable
+fun SaveFile(
+    modifier: Modifier,
+    label: String,
+    fileName: String,
+    mimeType: String = "text/plain",
+    onUri: (uri: Uri) -> Unit
+) {
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument(mimeType)
+    ) { uri: Uri? ->
+        if (uri != null) {
+            onUri(uri)
+        }
+    }
+
+    Button(
+        modifier = modifier.padding(end = 10.dp),
+        onClick = { launcher.launch(fileName) }
+    ) {
+        Text(
+            modifier = Modifier.padding(horizontal = 10.dp),
+            style = MaterialTheme.typography.headlineSmall,
+            text = label,
+        )
+    }
+
 }
