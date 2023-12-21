@@ -64,4 +64,65 @@ class WaveDataTest {
             )
         )
     }
+    @Test
+    fun `Check iterateTopIndexed`() {
+        val actual = mutableListOf<Pair<Int, Double>>()
+        WaveData(
+            values = doubleArrayOf(
+                -0.0, 0.01,
+                -0.1, 0.1,
+                -0.2, 0.2,
+                -0.3, 0.3,
+                -0.4, 0.4,
+                -0.5, 0.5,
+                -0.6, 0.6,
+            )
+        ).iterateTopIndexed { index, top ->
+            actual.add(index to top)
+        }
+        assertEquals(
+            actual = actual,
+            expected = mutableListOf(
+                0 to 0.01,
+                1 to 0.1,
+                2 to 0.2,
+                3 to 0.3,
+                4 to 0.4,
+                5 to 0.5,
+                6 to 0.6,
+            )
+        )
+    }
+
+    @Test
+    fun `Check iteratePairsIndexed with selection`() {
+        val actual = mutableListOf<Triple<Int, Double, Double>>()
+        WaveData(
+            values = doubleArrayOf(
+                -0.0, 0.01,
+                -0.1, 0.1,
+                -0.2, 0.2,
+                -0.3, 0.3,
+                -0.4, 0.4,
+                -0.5, 0.5,
+                -0.6, 0.6,
+            )
+        ).iteratePairsIndexed(
+            fromPairIndex = 1,
+            toPairIndex = 5
+        ) { index, top, bottom ->
+            actual.add(Triple(index, bottom, top))
+        }
+        assertEquals(
+            actual = actual,
+            expected = mutableListOf(
+                Triple(1, -0.1, 0.1),
+                Triple(2, -0.2, 0.2),
+                Triple(3, -0.3, 0.3),
+                Triple(4, -0.4, 0.4),
+                Triple(5, -0.5, 0.5),
+            )
+        )
+
+    }
 }
